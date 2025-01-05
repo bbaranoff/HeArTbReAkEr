@@ -115,9 +115,4 @@ RUN mv BsC-2rFa.patch openbsc \
     && make install \
     && ldconfig
 
-
-
-RUN apt install ruby-libxml ruby-dev ruby-dbus -y
-RUN gem install serial smartcard
-RUN git clone https://github.com/osmocom/softsim
-RUN sed -i -e 's/sim reader/sim sap/g' /root/.osmocom/bb/mobile.cfg
+RUN sed -i -e 's/sim reader/sim test/g' /root/.osmocom/bb/mobile.cfg
