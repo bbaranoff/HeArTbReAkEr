@@ -1,3 +1,0 @@
-/etc/osmocom/osmo-bsc-nat.cfg
-/lib/systemd/system/osmo-bsc-nat.service
-/usr/bin/osmo-bsc_nat

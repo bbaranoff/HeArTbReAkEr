@@ -1,4 +1,0 @@
-[[counters]]
-== Implemented Counters
-
-include::./counters_generated.adoc[]

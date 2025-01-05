@@ -1,3 +1,0 @@
-etc/osmocom/osmo-bsc-mgcp.cfg
-lib/systemd/system/osmo-bsc-mgcp.service
-usr/bin/osmo-bsc_mgcp
